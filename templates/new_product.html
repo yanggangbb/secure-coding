@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}새 상품 등록{% endblock %}
+{% block content %}
+<h2>상품 등록</h2>
+<form method="post" onsubmit="return validateForm()" action="{{ url_for('new_product') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  제목: <input type="text" name="title" required maxlength="20"><br>
+  설명: <br>
+  <textarea name="description" rows="4" cols="50" required style="resize: none;" maxlength="300"></textarea><br>
+  가격: <input type="number" name="price" required oninput="validateNumber(this)" min="0" max="1000000"><br>
+  <span id="priceError" style="color: red; display: none;">숫자만 입력할 수 있습니다.</span>
+  <span id="priceRangeError" style="color: red; display: none;">가격은 1,000,000원을 초과할 수 없습니다.</span>
+  <button type="submit">등록하기</button>
+</form>
+
+<script>
+function validateNumber(input) {
+    if (!/^\d*$/.test(input.value)) {
+        input.value = input.value.replace(/[^\d]/g, '');
+        document.getElementById('priceError').style.display = 'block';
+    } else {
+        document.getElementById('priceError').style.display = 'none';
+    }
+    
+    if (parseInt(input.value) > 1000000) {
+        document.getElementById('priceRangeError').style.display = 'block';
+    } else {
+        document.getElementById('priceRangeError').style.display = 'none';
+    }
+}
+
+function validateForm() {
+    var price = document.getElementsByName('price')[0].value;
+    var title = document.getElementsByName('title')[0].value;
+    var description = document.getElementsByName('description')[0].value;
+
+    // XSS 검증
+    if(/<[^>]*>/.test(title) || /<[^>]*>/.test(description)) {
+        alert("HTML 태그는 입력할 수 없습니다.");
+        return false;
+    }
+
+    if (!/^\d+$/.test(price)) {
+        document.getElementById('priceError').style.display = 'block';
+        return false;
+    }
+    if (parseInt(price) > 1000000) {
+        document.getElementById('priceRangeError').style.display = 'block';
+        return false;
+    }
+    return true;
+}
+</script>
+{% endblock %}

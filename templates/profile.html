@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}프로필{% endblock %}
+{% block content %}
+<h2>프로필 관리</h2>
+<p>사용자명: {{ user.username }}</p>
+<form method="post" onsubmit="return validateForm()">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  소개글: <br>
+  <textarea name="bio" rows="4" cols="50" maxlength="100" oninput="updateCharCount(this)">{{ user.bio or '' }}</textarea><br>
+  <span id="charCount">0/100</span><br>
+  <span id="bioError" style="color: red; display: none;">소개글은 100자 이하여야 합니다.</span><br>
+  <button type="submit">프로필 업데이트</button>
+</form>
+
+<script>
+function updateCharCount(textarea) {
+    var count = textarea.value.length;
+    document.getElementById('charCount').textContent = count + '/100';
+}
+
+function validateForm() {
+    var bio = document.getElementsByName('bio')[0].value;
+    if (bio.length > 100) {
+        document.getElementById('bioError').style.display = 'block';
+        return false;
+    }
+    return true;
+}
+
+// 페이지 로드 시 초기 문자 수 표시
+window.onload = function() {
+    var textarea = document.getElementsByName('bio')[0];
+    updateCharCount(textarea);
+};
+</script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}상품 상세보기{% endblock %}
+{% block content %}
+<h2 id="product-title" onclick="copyToClipboard('{{ product.id }}', '상품')">{{ product.title }}</h2>
+<p>판매상태: 
+    {% if product.sold_status == 1 %}
+        판매완료
+    {% else %}
+        판매중
+    {% endif %}
+</p>
+<p>{{ product.description }}</p>
+<p>가격: {{ product.price }}원</p>
+<p>판매자: <span id="seller-username" onclick="copyToClipboard('{{ product.seller_id }}', '{{ product.seller_username }}')">{{ product.seller_username }}</span></p>
+{% if product.seller_id == user.id %}
+  <button class="purchase-button my-product" disabled>내가 올린 상품입니다</button>
+{% elif product.seller_is_blocked == 1 %}
+  <p class="blocked-user">[차단된 사용자의 게시글입니다]</p>
+{% elif product.sold_status == 1 %}
+  <button class="purchase-button sold-out" disabled>SOLDOUT</button>
+{% else %}
+  <form action="{{ url_for('purchase', product_id=product.id) }}" method="post" class="purchase-form" onsubmit="return confirm('이 상품을 구매하시겠습니까?');">
+    <button type="submit" class="purchase-button">구매하기</button>
+  </form>
+{% endif %}
+
+<script>
+function copyToClipboard(text, name) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert(name + ' ID가 복사되었습니다');
+    }).catch(function(err) {
+        console.error('클립보드 복사 실패:', err);
+    });
+}
+</script>
+{% endblock %}
